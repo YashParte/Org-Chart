@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f7fb">
+  <meta name="theme-color" content="#41535d">
   <title>Organization Chart</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,7 @@
     <aside class="sidebar" id="sidebar" aria-label="Main navigation">
       <div class="brand-row">
         <a class="brand" href="#" aria-label="Organization Chart home">
-          <svg class="company-logo" viewBox="0 0 30 30" aria-hidden="true"><path d="M5 25.5h20M8 25V11.5L15 6l7 5.5V25M12 14h2v2h-2zm4 0h2v2h-2zm-4 4h2v2h-2zm4 0h2v2h-2zM14 25v-4h2v4"/><path d="M4 11.5 15 3l11 8.5"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="company-logo bi bi-diagram-3" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/></svg>
           <span class="brand-name">Organization Chart</span>
         </a>
         <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Collapse sidebar" aria-controls="sidebar" aria-expanded="true" title="Collapse sidebar"><span>‹</span></button>
@@ -29,6 +29,15 @@
       <nav class="side-nav">
         <button class="nav-item active" data-view="chart" title="Organization Chart"><span class="nav-icon">⌘</span><span>Organization Chart</span><span class="nav-count" id="nav-count">—</span></button>
         <button class="nav-item" data-view="directory" title="People directory"><span class="nav-icon">▤</span><span>People directory</span></button>
+        <button class="nav-item" id="sidebar-filters-button" type="button" title="Filters" aria-expanded="false" aria-controls="sidebar-filter-panel"><span class="nav-icon">☷</span><span>Filters</span><span class="nav-count filter-count" id="filter-count" hidden>0</span></button>
+        <div class="sidebar-filter-panel" id="sidebar-filter-panel" hidden>
+          <label>Department<select id="department-filter"><option value="">All departments</option></select></label>
+          <label>Zone<select id="zone-filter"><option value="">All zones</option></select></label>
+          <label>Group<select id="group-filter"><option value="">All groups</option></select></label>
+          <label>Sub-group<select id="subgroup-filter"><option value="">All sub-groups</option></select></label>
+          <label>Status<select id="status-filter"><option value="">All statuses</option><option>Active</option><option>On leave</option><option>Inactive</option><option>Vacant</option></select></label>
+          <button id="clear-filters" class="clear-filters" type="button">Clear filters</button>
+        </div>
       </nav>
       <div class="sidebar-bottom">
         <div class="help-card">
@@ -62,26 +71,17 @@
         <div class="view-tabs" role="tablist" aria-label="Organization views"><button class="view-tab selected" role="tab" aria-selected="true" data-view="chart"><span class="tab-icon">⌘</span> Org chart</button><button class="view-tab" role="tab" aria-selected="false" data-view="directory"><span class="tab-icon">▤</span> People directory <span class="tab-badge" id="directory-count">—</span></button><span class="tab-spacer"></span><span class="data-source"><span class="source-dot"></span> <span id="source-label">Sample organization</span></span></div>
 
         <section class="chart-view" id="chart-view">
-          <div class="print-heading" id="print-heading"><div class="print-brand"><svg class="company-logo" viewBox="0 0 30 30" aria-hidden="true"><path d="M5 25.5h20M8 25V11.5L15 6l7 5.5V25M12 14h2v2h-2zm4 0h2v2h-2zm-4 4h2v2h-2zm4 0h2v2h-2zM14 25v-4h2v4"/><path d="M4 11.5 15 3l11 8.5"/></svg></div><strong>Organization Chart</strong><span id="print-subtitle"></span></div>
+          <div class="print-heading" id="print-heading"><div class="print-brand"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="company-logo bi bi-diagram-3" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/></svg></div><strong>Organization Chart</strong><span id="print-subtitle"></span></div>
           <div class="chart-toolbar">
             <div class="chart-toolbar-left"><div class="control-group"><span class="control-label">START FROM</span><label class="select-wrap"><span class="select-person-icon">◎</span><select id="root-select" aria-label="Choose chart top node"></select><span class="select-chevron">⌄</span></label></div>
               <span class="toolbar-divider"></span>
               <label class="search-wrap"><span class="search-icon">⌕</span><input id="chart-search" type="search" placeholder="Find a person" autocomplete="off"><kbd>⌘ K</kbd></label>
-              <button class="toolbar-button" id="filters-button"><span class="toolbar-icon">☷</span> Filters<span class="filter-count" id="filter-count" hidden>0</span></button>
               <div class="fields-wrap"><button class="toolbar-button" id="fields-button"><span class="toolbar-icon">▤</span> Card fields <span class="small-chevron">⌄</span></button><div class="fields-menu" id="fields-menu" hidden></div></div>
             </div>
-            <div class="chart-toolbar-right"><div class="zoom-controls"><button class="zoom-button" id="zoom-out" aria-label="Zoom out">−</button><span class="zoom-value" id="zoom-value">100%</span><button class="zoom-button" id="zoom-in" aria-label="Zoom in">＋</button></div><span class="toolbar-divider"></span><button class="toolbar-button fit-button" id="fit-button"><span class="toolbar-icon">⛶</span> Fit</button><button class="toolbar-button icon-only" id="expand-button" title="Expand all teams" aria-label="Expand all teams">⊞</button></div>
-          </div>
-          <div class="filter-panel" id="filter-panel" hidden>
-            <label>Department<select id="department-filter"><option value="">All departments</option></select></label>
-            <label>Zone<select id="zone-filter"><option value="">All zones</option></select></label>
-            <label>Group<select id="group-filter"><option value="">All groups</option></select></label>
-            <label>Sub-group<select id="subgroup-filter"><option value="">All sub-groups</option></select></label>
-            <label>Status<select id="status-filter"><option value="">All statuses</option><option>Active</option><option>On leave</option><option>Inactive</option><option>Vacant</option></select></label>
-            <button id="clear-filters" class="clear-filters">Clear filters</button>
+            <div class="chart-toolbar-right"><div class="zoom-controls"><button class="zoom-button" id="zoom-out" aria-label="Zoom out">−</button><span class="zoom-value" id="zoom-value">100%</span><button class="zoom-button" id="zoom-in" aria-label="Zoom in">＋</button></div><span class="toolbar-divider"></span><button class="toolbar-button fit-button" id="fit-button"><span class="toolbar-icon">⛶</span> Fit</button><button class="toolbar-button" id="focus-button" aria-pressed="false" title="Focus on the org chart"><span class="toolbar-icon">⛶</span> Focus</button><button class="toolbar-button icon-only" id="expand-button" title="Expand all teams" aria-label="Expand all teams">⊞</button></div>
           </div>
           <div class="chart-summary"><span id="chart-summary-text">Reporting structure</span><span class="summary-separator">·</span><span id="chart-headcount">— people shown</span><span class="chart-summary-spacer"></span><span class="chart-hint"><span class="hint-dot"></span> Select a person to edit details</span></div>
-          <div class="chart-viewport" id="chart-viewport"><div class="chart-stage" id="chart-stage"><div class="org-tree" id="org-tree"></div></div><div class="empty-chart" id="empty-chart" hidden><div class="empty-illustration">⌘</div><strong>No people match these filters</strong><span>Try changing the search or filter criteria.</span><button class="button button-secondary" id="empty-clear">Clear filters</button></div></div>
+          <div class="chart-viewport" id="chart-viewport"><button class="focus-exit" id="focus-exit" type="button" title="Exit chart focus mode"><span>×</span> Exit focus</button><div class="chart-stage" id="chart-stage"><div class="org-tree" id="org-tree"></div></div><div class="empty-chart" id="empty-chart" hidden><div class="empty-illustration">⌘</div><strong>No people match these filters</strong><span>Try changing the search or filter criteria.</span><button class="button button-secondary" id="empty-clear">Clear filters</button></div></div>
           <footer class="chart-footer"><span><span class="footer-key">TIP</span> Choose anyone as the top node to explore their team.</span><span id="chart-footer-count">— people in this chart</span></footer>
         </section>
 

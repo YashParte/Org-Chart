@@ -41,7 +41,7 @@ The importer also recognizes common variations such as `Manager ID`, `Manager`, 
 - Choose any employee as the chart's top node.
 - Search for people and filter by Department, Zone, Group, Sub-group, or Status. Filters can be combined.
 - Use **Card fields** to choose which employee details appear on chart cards.
-- Collapse or expand reporting branches, adjust zoom, or use **Fit** to bring the chart into view.
+- Collapse or expand reporting branches, adjust zoom, or use **Fit** to bring the chart into view. Use **Focus** to hide the surrounding page controls and expand the chart across the right workspace; press `Esc` or choose **Exit focus** to return.
 - Select a chart card or use the people directory to edit all employee fields. You can also add or delete people.
 - Export the directory as CSV.
 - Choose **Export PDF**, then select **Save as PDF** in the browser's print dialog. The print layout is landscape and fits the selected chart onto one page.
