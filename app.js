@@ -53,6 +53,7 @@ let hasUserData = false;
 let people = loadPeople();
 let rootId = chooseInitialRoot();
 let currentView = 'chart';
+let focusMode = false;
 let zoom = 1;
 let chartSearch = '';
 let collapsed = new Set();
@@ -63,6 +64,7 @@ let toastTimer;
 let dirtyTimer;
 let workspaceName = readWorkspaceName();
 let sidebarCollapsed = safeStorageGet(SIDEBAR_KEY) === 'true';
+let sidebarFiltersOpen = false;
 const filters = { department: '', zone: '', group: '', subGroup: '', status: '' };
 
 function loadPeople() {
@@ -119,6 +121,9 @@ function refresh() {
   $('#sidebar-toggle').setAttribute('aria-label', sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
   $('#sidebar-toggle').title = sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar';
   $('#sidebar-toggle span').textContent = sidebarCollapsed ? '›' : '‹';
+  $('#sidebar-filter-panel').hidden = !sidebarFiltersOpen;
+  $('#sidebar-filters-button').setAttribute('aria-expanded', String(sidebarFiltersOpen));
+  $('#sidebar-filters-button').classList.toggle('filter-open', sidebarFiltersOpen);
 }
 function renderStats() {
   const managers = people.filter(person => childrenOf(person.employeeId).length > 0).length;
@@ -241,6 +246,7 @@ function renderDirectory() {
   $('#table-count').textContent = `${rows.length} of ${people.length} people`;
 }
 function switchView(view) {
+  if (focusMode && view !== 'chart') setFocusMode(false);
   currentView = view;
   $('#chart-view').hidden = view !== 'chart'; $('#directory-view').hidden = view !== 'directory';
   $$('[data-view]').forEach(button => {
@@ -250,6 +256,22 @@ function switchView(view) {
   });
   const name = view === 'chart' ? 'Organization Chart' : 'People directory';
   $('#breadcrumb-current').textContent = name; $('#page-title').textContent = name; $('#page-description').textContent = view === 'chart' ? 'See how your people and teams connect.' : 'View and update every employee in one place.';
+}
+function setFocusMode(enabled) {
+  focusMode = enabled;
+  $('.app-shell').classList.toggle('is-focus-mode', focusMode);
+  $('#focus-button').setAttribute('aria-pressed', String(focusMode));
+  $('#focus-button').title = focusMode ? 'Exit chart focus mode' : 'Focus on the org chart';
+  $('#focus-exit').hidden = !focusMode;
+  requestAnimationFrame(positionTree);
+}
+function toggleSidebarFilters() {
+  if (sidebarCollapsed) {
+    sidebarCollapsed = false;
+    try { localStorage.setItem(SIDEBAR_KEY, 'false'); } catch (_) { /* Keep the sidebar expanded for this session. */ }
+    sidebarFiltersOpen = true;
+  } else sidebarFiltersOpen = !sidebarFiltersOpen;
+  refresh();
 }
 
 function dateValue(value) {
@@ -582,7 +604,7 @@ document.addEventListener('click', event => {
 $('#root-select').addEventListener('change', event => setRoot(event.target.value));
 $('#chart-search').addEventListener('input', event => { chartSearch = event.target.value.trim(); renderChart(); });
 $('#directory-search').addEventListener('input', renderDirectory);
-$('#filters-button').addEventListener('click', () => { $('#filter-panel').hidden = !$('#filter-panel').hidden; });
+$('#sidebar-filters-button').addEventListener('click', toggleSidebarFilters);
 $('#department-filter').addEventListener('change', event => { filters.department = event.target.value; renderChart(); updateFilterCount(); });
 $('#zone-filter').addEventListener('change', event => { filters.zone = event.target.value; renderChart(); updateFilterCount(); });
 $('#group-filter').addEventListener('change', event => { filters.group = event.target.value; renderChart(); updateFilterCount(); });
@@ -611,6 +633,8 @@ $('#file-input').addEventListener('change', async event => {
   event.target.value = '';
 });
 $('#pdf-button').addEventListener('click', exportPdf);
+$('#focus-button').addEventListener('click', () => setFocusMode(!focusMode));
+$('#focus-exit').addEventListener('click', () => setFocusMode(false));
 $('#add-person-button').addEventListener('click', () => openPersonForm());
 $('#export-csv-button').addEventListener('click', downloadCsv);
 $('#person-form').addEventListener('submit', savePerson);
@@ -631,7 +655,13 @@ $('#help-button').addEventListener('click', () => toast('Import your employee te
 $('.help-dismiss').addEventListener('click', event => { event.currentTarget.closest('.help-card').hidden = true; });
 document.addEventListener('keydown', event => {
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); $('#chart-search').focus(); }
-  if (event.key === 'Escape') { $('#fields-menu').hidden = true; if (!$('#modal-backdrop').hidden) closeModal(); if (!$('#workspace-modal-backdrop').hidden) closeWorkspaceSettings(); }
+  if (event.key === 'Escape') {
+    $('#fields-menu').hidden = true;
+    const modalWasOpen = !$('#modal-backdrop').hidden || !$('#workspace-modal-backdrop').hidden;
+    if (!$('#modal-backdrop').hidden) closeModal();
+    if (!$('#workspace-modal-backdrop').hidden) closeWorkspaceSettings();
+    if (!modalWasOpen && focusMode) setFocusMode(false);
+  }
 });
 window.addEventListener('resize', () => { if (currentView === 'chart') positionTree(); });
 window.addEventListener('beforeprint', () => {
